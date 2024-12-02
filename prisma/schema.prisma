@@ -1,0 +1,84 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  id       Int        @id @default(autoincrement())
+  username String     @unique
+  password String
+  nickname String     @unique
+  cash     Int        @default(10000)
+  rating   Int        @default(1000)
+  storage  Storage[]  @relation("UserStorage")
+  squad    Squad?     @relation("UserSquad")
+  matchesA MatchLog[] @relation("UserA")
+  matchesB MatchLog[] @relation("UserB")
+  userCard UserCard[] @relation("UserCards")
+}
+
+model Storage {
+  id     Int      @id @default(autoincrement())
+  user   Users    @relation("UserStorage", fields: [userid], references: [id], onDelete: Cascade)
+  userid Int
+  card   UserCard @relation("CardStorage", fields: [cardid], references: [id], onDelete: Cascade)
+  cardid Int
+}
+
+model BaseCard {
+  id         Int    @id
+  playername String
+  position   String
+  shoot      Int
+  pass       Int
+  defense    Int
+}
+
+model UserCard {
+  id         Int       @id @default(autoincrement())
+  playername String
+  position   String
+  user       Users     @relation("UserCards", fields: [userid], references: [id], onDelete: Cascade)
+  userid     Int
+  level      Int       @default(0)
+  shoot      Int
+  pass       Int
+  defense    Int
+  storage    Storage[] @relation("CardStorage")
+  squad1     Squad[]   @relation("Player1")
+  squad2     Squad[]   @relation("Player2")
+  squad3     Squad[]   @relation("Player3")
+}
+
+model Squad {
+  id        Int      @id @default(autoincrement())
+  user      Users    @relation("UserSquad", fields: [userid], references: [id], onDelete: Cascade)
+  userid    Int      @unique
+  player1   UserCard? @relation("Player1", fields: [player1Id], references: [id], onDelete: SetNull)
+  player1Id Int?
+  player2   UserCard? @relation("Player2", fields: [player2Id], references: [id], onDelete: SetNull)
+  player2Id Int?
+  player3   UserCard? @relation("Player3", fields: [player3Id], references: [id], onDelete: SetNull)
+  player3Id Int?
+  supportUsed Boolean  @default(false)
+}
+
+model MatchLog {
+  id            Int      @id @default(autoincrement())
+  userA         Users    @relation("UserA", fields: [userAid], references: [id])
+  userAid       Int
+  userB         Users    @relation("UserB", fields: [userBid], references: [id])
+  userBid       Int
+  scoreA        Int
+  scoreB        Int
+  RatingChangeA Int
+  RatingChangeB Int
+  matchdate     DateTime @default(now())
+}
