@@ -56,3 +56,29 @@ model UserCard {
   squad2     Squad[]   @relation("Player2")
   squad3     Squad[]   @relation("Player3")
 }
+
+model Squad {
+  id        Int      @id @default(autoincrement())
+  user      Users    @relation("UserSquad", fields: [userid], references: [id], onDelete: Cascade)
+  userid    Int      @unique
+  player1   UserCard? @relation("Player1", fields: [player1Id], references: [id], onDelete: SetNull)
+  player1Id Int?
+  player2   UserCard? @relation("Player2", fields: [player2Id], references: [id], onDelete: SetNull)
+  player2Id Int?
+  player3   UserCard? @relation("Player3", fields: [player3Id], references: [id], onDelete: SetNull)
+  player3Id Int?
+  supportUsed Boolean  @default(false)
+}
+
+model MatchLog {
+  id            Int      @id @default(autoincrement())
+  userA         Users    @relation("UserA", fields: [userAid], references: [id])
+  userAid       Int
+  userB         Users    @relation("UserB", fields: [userBid], references: [id])
+  userBid       Int
+  scoreA        Int
+  scoreB        Int
+  RatingChangeA Int
+  RatingChangeB Int
+  matchdate     DateTime @default(now())
+}
