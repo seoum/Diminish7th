@@ -1,0 +1,25 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  id       Int        @id @default(autoincrement())
+  username String     @unique
+  password String
+  nickname String     @unique
+  cash     Int        @default(10000)
+  rating   Int        @default(1000)
+  storage  Storage[]  @relation("UserStorage")
+  squad    Squad?     @relation("UserSquad")
+  matchesA MatchLog[] @relation("UserA")
+  matchesB MatchLog[] @relation("UserB")
+  userCard UserCard[] @relation("UserCards")
+}
